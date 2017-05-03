@@ -1,0 +1,83 @@
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        .scrollable_chat {
+            overflow-y: scroll;
+            height: 400px;
+        }
+    </style>
+  </head>
+  <body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-8">
+                <img src="http://localhost:8080/exchange/screenshot" class="img-fluid" id="screenshot"/>
+            </div>
+            <div class="col-4">
+                <div class="scrollable_chat" id="chat"></div>
+                <input type="text" id="messageInput"/>
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                Количество пользователей: <span id="users_count"></span> 
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery first, then Tether, then Bootstrap JS. -->
+    <script src="http://cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
+    <script src='vertx-eventbus.js'></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script>
+        var eb = new EventBus("http://localhost:8080/eventbus");
+
+        eb.onopen = function() {
+            console.log("registering event bus handler...");
+            
+            eb.registerHandler("service.chat", function(error, message) {
+                console.log("Received message from server: ", JSON.stringify(message) );
+            });  
+
+            eb.registerHandler("service.chat.online", function(error, message) {
+                var onlineUsersSpan = $('#users_count');
+                onlineUsersSpan.text(message.body.message);
+                
+            });
+
+            eb.registerHandler("service.chat.broadcast", function(error, message) {
+                console.log(JSON.stringify(message));
+                var chatDiv =$('#chat'); 
+                chatDiv.append(message.body.author + ': ' + message.body.message + '<br/>');
+                chatDiv.scrollTop(chatDiv.prop('scrollHeight'));
+            });
+
+            eb.registerHandler("service.screenshot.updated", function(error, message) {
+                updateImage();
+            });
+       
+        }
+
+        function sendMessage() {
+            var messageText = $('#messageInput').val();
+            console.log(messageText);
+            eb.send("service.chat.output", {message: messageText});
+        }
+
+        function updateImage() {
+           var imageElement = document.getElementById("screenshot");
+           imageElement.src = "http://localhost:8080/exchange/screenshot?rand=" + Math.random();
+        }
+    </script>
+  </body>
+</html>

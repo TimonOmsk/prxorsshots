@@ -8,8 +8,12 @@ import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 public class ApplicationStartup {
+
+    private final Logger LOG = LoggerFactory.getLogger("CORE");
 
     public void start() {
         Vertx vertx = Vertx.vertx();
@@ -28,7 +32,7 @@ public class ApplicationStartup {
 
         retriever.getConfig(jsonObjectAsyncResult -> {
             if(jsonObjectAsyncResult.failed()) {
-                System.out.println("Failed to load configuration");
+                LOG.error("Failed to load configuration.");
                 System.exit(-1);
             } else {
                 deployVerticles(vertx, jsonObjectAsyncResult.result());
@@ -44,7 +48,7 @@ public class ApplicationStartup {
             DeploymentOptions screenshotDeploymentOptions = new DeploymentOptions().setConfig(screenshotConfig);
             vertx.deployVerticle(new SchreenshotHostVerticle(), screenshotDeploymentOptions);
         } else {
-            System.out.println("Cannot load configuration for screenshot capturing feature.");
+            LOG.warn("Cannot load configuration for screenshot capturing feature.");
         }
 
         JsonObject hostConfig = config.getJsonObject("host");
@@ -52,7 +56,7 @@ public class ApplicationStartup {
             DeploymentOptions hostDeploymentOptions = new DeploymentOptions().setConfig(hostConfig);
             vertx.deployVerticle(new HostVerticle(), hostDeploymentOptions);
         } else {
-            System.out.println("Cannot load configuration for host feature.");
+            LOG.warn("Cannot load configuration for host feature");
         }
 
     }

@@ -45,7 +45,6 @@ public class HostVerticle extends AbstractVerticle {
         });
 
         eb.consumer("service.chat.output", message -> {
-            System.out.println(message.body());
             JsonObject jsonMessage = (JsonObject)message.body();
             JsonObject object = new JsonObject();
             object.put("author", "Client");
