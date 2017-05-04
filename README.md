@@ -3,16 +3,27 @@ Client-server application, where the Host exposes its screen and plays as a chat
 
 ## Build
 
+### Server-side
+
 ```
 mvn clean package
 ```
+### Frontend
+
+No build required
 
 ## Usage
 
+### Server-side
 ```
 usage: java -jar golushko-1.0-SNAPSHOT.jar -c <arg>
  -c,--config <arg>   Path to config file
 ```
+
+### Frontend
+
+Just open ``front/index.html``
+
 
 ## Technology stack
 + **Vertx** - http://vertx.io/ 
