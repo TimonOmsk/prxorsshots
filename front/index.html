@@ -21,14 +21,16 @@
                 <img src="http://localhost:8080/exchange/screenshot" class="img-fluid" id="screenshot" alt="No screenshot available"/>
             </div>
             <div class="col-4">
+                <h1 class="display-3">Chat.Online: <span id="users_count"></span></h1>  
                 <div class="scrollable_chat" id="chat"></div>
-                <input type="text" id="messageInput"/>
-                <button onclick="sendMessage()">Send</button>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                Количество пользователей: <span id="users_count"></span> 
+                <div class="row">
+                    <div class="col-10">
+                        <input type="text" class="form-control" id="messageInput"/>
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="btn btn-primary" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -58,7 +60,7 @@
             eb.registerHandler("service.chat.broadcast", function(error, message) {
                 console.log(JSON.stringify(message));
                 var chatDiv =$('#chat'); 
-                chatDiv.append(message.body.author + ': ' + message.body.message + '<br/>');
+                chatDiv.append(message.body.messageDate + ' ' + message.body.author + ': ' + message.body.message + '<br/>');
                 chatDiv.scrollTop(chatDiv.prop('scrollHeight'));
             });
 
