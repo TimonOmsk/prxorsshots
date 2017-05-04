@@ -18,7 +18,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-8">
-                <img src="http://localhost:8080/exchange/screenshot" class="img-fluid" id="screenshot"/>
+                <img src="http://localhost:8080/exchange/screenshot" class="img-fluid" id="screenshot" alt="No screenshot available"/>
             </div>
             <div class="col-4">
                 <div class="scrollable_chat" id="chat"></div>
@@ -49,7 +49,7 @@
                 console.log("Received message from server: ", JSON.stringify(message) );
             });  
 
-            eb.registerHandler("service.chat.online", function(error, message) {
+            eb.registerHandler("service.host.online", function(error, message) {
                 var onlineUsersSpan = $('#users_count');
                 onlineUsersSpan.text(message.body.message);
                 
@@ -72,6 +72,7 @@
             var messageText = $('#messageInput').val();
             console.log(messageText);
             eb.send("service.chat.output", {message: messageText});
+            $('#messageInput').val('');
         }
 
         function updateImage() {

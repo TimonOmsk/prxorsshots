@@ -25,6 +25,14 @@ public class HostVerticle extends AbstractVerticle {
     private final AtomicInteger clientsCount = new AtomicInteger(0);
     private final Logger logger = LoggerFactory.getLogger(HostVerticle.class);
 
+    private final static String EB_ADDRESS_SERVICE_CHAT_ALL_REGEX = "service.chat.*";
+    private final static String EB_ADDRESS_SERVICE_HOST_ALL_REGEX = "service.host.*";
+    private final static String EB_ADDRESS_SERVICE_SCREENSHOT_ALL_REGEX = "service.screenshot.*";
+
+
+    private final static String EB_ADDRESS_SERVICE_HOST_ONLINE = "service.host.online";
+
+
     @Override
     public void start() throws Exception {
 
@@ -41,16 +49,7 @@ public class HostVerticle extends AbstractVerticle {
             object.put("author", "Server");
             object.put("messageDate", new Date().toString());
             object.put("message", clientsCount.get());
-            eb.publish("service.chat.online", object);
-        });
-
-        eb.consumer("service.chat.output", message -> {
-            JsonObject jsonMessage = (JsonObject)message.body();
-            JsonObject object = new JsonObject();
-            object.put("author", "Client");
-            object.put("messageDate", new Date().toString());
-            object.put("message", jsonMessage.getValue("message"));
-            eb.publish("service.chat.broadcast", object);
+            eb.publish(EB_ADDRESS_SERVICE_HOST_ONLINE, object);
         });
 
         HttpServer server = vertx.createHttpServer();
@@ -59,13 +58,14 @@ public class HostVerticle extends AbstractVerticle {
 
         SockJSHandler sockJSHandler = SockJSHandler.create(vertx);
 
-        PermittedOptions chatPermittedOptions = new PermittedOptions().setAddressRegex("service.chat.*");
-
-        PermittedOptions screenshotPermittedOptions = new PermittedOptions().setAddress("service.screenshot.updated");
+        PermittedOptions chatPermittedOptions = new PermittedOptions().setAddressRegex(EB_ADDRESS_SERVICE_CHAT_ALL_REGEX);
+        PermittedOptions screenshotPermittedOptions = new PermittedOptions().setAddressRegex(EB_ADDRESS_SERVICE_SCREENSHOT_ALL_REGEX);
+        PermittedOptions hostPermittedOptions = new PermittedOptions().setAddressRegex(EB_ADDRESS_SERVICE_HOST_ALL_REGEX);
 
         BridgeOptions options = new BridgeOptions();
         options.addOutboundPermitted(chatPermittedOptions);
         options.addOutboundPermitted(screenshotPermittedOptions);
+        options.addOutboundPermitted(hostPermittedOptions);
         options.addInboundPermitted(chatPermittedOptions);
         sockJSHandler.bridge(options, bridgeEvent -> {
             if(bridgeEvent.type() == BridgeEventType.SOCKET_CREATED) {

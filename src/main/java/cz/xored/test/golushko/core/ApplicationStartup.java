@@ -1,7 +1,8 @@
 package cz.xored.test.golushko.core;
 
 import cz.xored.test.golushko.HostVerticle;
-import cz.xored.test.golushko.screenshot.SchreenshotHostVerticle;
+import cz.xored.test.golushko.chat.ChatVerticle;
+import cz.xored.test.golushko.screenshot.ScreenshotHostVerticle;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
@@ -15,7 +16,7 @@ public class ApplicationStartup {
 
     private final Logger LOG = LoggerFactory.getLogger("CORE");
 
-    public void start() {
+    public void start(String pathToConfig) {
         Vertx vertx = Vertx.vertx();
 
         ConfigStoreOptions defaultConfig = new ConfigStoreOptions()
@@ -24,7 +25,7 @@ public class ApplicationStartup {
 
         ConfigStoreOptions fileStore = new ConfigStoreOptions()
                 .setType("file")
-                .setConfig(new JsonObject().put("path", "config.json"));
+                .setConfig(new JsonObject().put("path", pathToConfig));
 
         ConfigRetrieverOptions options = new ConfigRetrieverOptions().addStore(defaultConfig).addStore(fileStore);
 
@@ -46,7 +47,7 @@ public class ApplicationStartup {
         JsonObject screenshotConfig = config.getJsonObject("screenshots");
         if(screenshotConfig != null) {
             DeploymentOptions screenshotDeploymentOptions = new DeploymentOptions().setConfig(screenshotConfig);
-            vertx.deployVerticle(new SchreenshotHostVerticle(), screenshotDeploymentOptions);
+            vertx.deployVerticle(new ScreenshotHostVerticle(), screenshotDeploymentOptions);
         } else {
             LOG.warn("Cannot load configuration for screenshot capturing feature.");
         }
@@ -58,6 +59,8 @@ public class ApplicationStartup {
         } else {
             LOG.warn("Cannot load configuration for host feature");
         }
+
+        vertx.deployVerticle(new ChatVerticle());
 
     }
 

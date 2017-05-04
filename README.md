@@ -1,6 +1,13 @@
 ## Decription
 Client-server application, where the Host exposes its screen and plays as a chat server, and the Client is a web application that shows what the server exposes and also allows to send/receive short messages.
 
+## Usage
+
+```
+usage: golushko-1.0-SNAPSHOT.jar -c <arg>
+ -c,--config <arg>   Path to config file
+```
+
 ## Technology stack
 + **Vertx** - http://vertx.io/ 
 + **Maven** 
