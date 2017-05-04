@@ -23,7 +23,7 @@ public class Main {
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             HelpFormatter helpFormatter = new HelpFormatter();
-            helpFormatter.printHelp("golushko-1.0-SNAPSHOT.jar", options, true);
+            helpFormatter.printHelp("java -jar golushko-1.0-SNAPSHOT.jar", options, true);
         }
 
 
